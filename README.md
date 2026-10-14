@@ -14,7 +14,7 @@
 
 
 # PlugBrain
-PlugBrain is an app that encourages regular breaks from distracting apps by blocking access at scheduled intervals.
+This fork asks for a mental math challenge whenever a selected app enters the foreground. Solve it to use that app without timed scrolling interruptions. Leaving and returning, switching to another selected app, or locking the screen starts a new challenge. Each opening increases the next difficulty level across all selected apps, up to level 15. Difficulty is saved on-device and does not decay over time.
 To regain access, you’ll need to solve a math challenge that adjusts in difficulty: 
 the more frequently you use the apps, 
 the harder the challenges become, but the longer you stay away, the easier they get.
@@ -30,14 +30,14 @@ the harder the challenges become, but the longer you stay away, the easier they 
 ## Features
   - Blocks distracting apps
   - Unblock apps by solving math challenges
-  - Difficulty increases with frequent use, decreases with focus
+  - Difficulty increases with every app opening and persists between sessions
   - No tracking, no ads
   - No internet required
 
 ## How to use
   - Grant all required permissions
   - Select distracting apps
-  - Choose your focus frequency
+  - Challenges run on app opening, with no interval setting
   - Select minimum starting difficulty
   - Stay focused ;)
 

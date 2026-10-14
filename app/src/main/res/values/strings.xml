@@ -1,4 +1,26 @@
 <resources>
+    <string name="dashboard_title">A little pause. A clearer mind.</string>
+    <string name="opening_level">Level %1$d</string>
+    <string name="pause_before_opening">Before you open it</string>
+    <string name="opening_prompt">Solve one mental math problem to continue.</string>
+    <string name="unlock_app">Unlock app</string>
+    <string name="answer_try_again">Not quite. Take your time and try again.</string>
+    <string name="return_to_home">Return to home</string>
+    <string name="opening_challenge_hint">A challenge at every opening. Uninterrupted time once you solve it.</string>
+    <string name="next_challenge">YOUR NEXT CHALLENGE</string>
+    <string name="progression_description">Each opening raises the next level, up to the hardest challenge. Progress is shared across your selected apps.</string>
+    <string name="selected_apps">Selected apps</string>
+    <string name="select_apps_hint">Choose the apps you want to open more intentionally.</string>
+    <string name="manage_apps">Manage apps</string>
+    <string name="starting_difficulty">Starting difficulty</string>
+    <plurals name="selected_app_count">
+        <item quantity="one">%d app selected</item>
+        <item quantity="other">%d apps selected</item>
+    </plurals>
+    <string name="how_it_works">Make every opening intentional</string>
+    <string name="opening_rules">1. Open a selected app.\n2. Solve a mental math challenge.\n3. Use the app without timed interruptions.\n\nLeaving and returning starts a new challenge.</string>
+    <string name="finish_setup">Finish setting up</string>
+    <string name="finish_setup_hint">Enable the required permissions in Settings to start app-opening challenges.</string>
     <string name="app_name" translatable="false">PlugBrain</string>
     <string name="app_name_with_brain_icon" translatable="false">PlugBrain 🧠</string>
     <string name="permissions_title">Permissions</string>
@@ -62,8 +84,8 @@
     <string name="welcome_feature_one_title">Focus your attention</string>
     <string name="welcome_feature_one_description">Spend less time on apps that distract you.</string>
     <string name="welcome_feature_two_title">Unlock with a challenge</string>
-    <string name="welcome_feature_two_description">Solve a quick math challenge to keep using the app.</string>
-    <string name="welcome_feature_three_title">Gets harder the longer you stay</string>
-    <string name="welcome_feature_three_description">Challenges increase in difficulty the longer you keep scrolling.</string>
+    <string name="welcome_feature_two_description">Solve a quick math challenge each time you open a selected app.</string>
+    <string name="welcome_feature_three_title">Every opening raises the bar</string>
+    <string name="welcome_feature_three_description">Each opening increases the next challenge level. Scroll without timed interruptions.</string>
     <string name="welcome_cta_title">Get started</string>
 </resources>

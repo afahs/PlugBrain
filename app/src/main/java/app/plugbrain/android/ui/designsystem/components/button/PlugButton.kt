@@ -22,14 +22,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.plugbrain.android.R
 import app.plugbrain.android.ui.theme.MathlockAppTheme
-import app.plugbrain.android.ui.theme.PrimaryGradient
 
 val shape = RoundedCornerShape(50)
 val buttonPadding = PaddingValues(
@@ -51,20 +49,10 @@ fun PlugButtonPrimary(
     shape = shape,
     contentPadding = buttonPadding,
     colors = ButtonDefaults.buttonColors(
-      containerColor = Color.Transparent,
+      containerColor = MaterialTheme.colorScheme.primary,
       disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
     ),
-    modifier = modifier
-      .then(
-        if (enabled) {
-          Modifier.background(
-            brush = PrimaryGradient,
-            shape = shape,
-          )
-        } else {
-          Modifier
-        },
-      ),
+    modifier = modifier,
   ) {
     ButtonContent(
       text = text,

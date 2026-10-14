@@ -149,9 +149,9 @@ fun PlugNumericalInput(
 }
 
 private object PlugNumericalInputDefaults {
-  val Shape = RoundedCornerShape(50)
-  val ElevationFocused = 12.dp
-  val ElevationFeedback = 6.dp
+  val Shape = RoundedCornerShape(16.dp)
+  val ElevationFocused = 0.dp
+  val ElevationFeedback = 0.dp
 }
 
 @Composable

@@ -1,41 +1,33 @@
 package app.plugbrain.android.ui.challenges.compose
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.plugbrain.android.BuildConfig
 import app.plugbrain.android.R
-import app.plugbrain.android.challenges.MissingChallenge
 import app.plugbrain.android.challenges.NumericalChallenge
-import app.plugbrain.android.challenges.TwoOperandsChallenge
 import app.plugbrain.android.challenges.addition.AdditionTwoDigitsCarryFreeChallenge
-import app.plugbrain.android.challenges.square.SquareChallenge
-import app.plugbrain.android.ui.isPortrait
+import app.plugbrain.android.ui.designsystem.components.card.PlugCard
 
 @Composable
 fun NumericalChallengeScreen(
@@ -45,100 +37,54 @@ fun NumericalChallengeScreen(
   checkAnswer: (Int?) -> Unit,
   onExitChallenge: () -> Unit,
 ) {
-  Scaffold(
-    modifier = Modifier.imePadding(),
-    bottomBar = {
-      Box(
-        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)
-          .padding(
-            paddingValues = WindowInsets.navigationBars.asPaddingValues(),
-          ),
-        contentAlignment = Alignment.Center,
-      ) {
-        ElevatedButton(
-          modifier = Modifier
-            .widthIn(max = 400.dp)
-            .fillMaxWidth()
-            .height(50.dp)
-            .padding(horizontal = 16.dp),
-          onClick = onExitChallenge,
-          colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-          ),
-        ) {
-          Icon(
-            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 8.dp),
-          )
-          Text(stringResource(R.string.take_me_out_of_here))
-        }
-      }
-    },
-  ) { innerPadding ->
+  var answer by rememberSaveable(challenge) { mutableStateOf("") }
+  var isError by rememberSaveable(challenge) { mutableStateOf(false) }
+  Scaffold(modifier = modifier.imePadding()) { innerPadding ->
     Column(
-      modifier = modifier
-        .fillMaxSize()
-        .padding(innerPadding),
+      modifier = Modifier.fillMaxSize().padding(innerPadding)
+        .verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 32.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-      if (BuildConfig.DEBUG) {
-        Text(
-          text = challenge.difficultyLevel.toString(),
-          style = MaterialTheme.typography.titleSmall,
-        )
-      }
+      Text(
+        stringResource(R.string.opening_level, challenge.difficultyLevel),
+        color = MaterialTheme.colorScheme.primary,
+        style = MaterialTheme.typography.labelLarge,
+      )
       ChallengeHeader()
-      if (isPortrait()) {
-        Content(
-          challenge = challenge,
-          triggerAnimation = triggerAnimation,
-          checkAnswer = checkAnswer,
-        )
-      } else {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Content(
-            challenge = challenge,
-            triggerAnimation = triggerAnimation,
-            checkAnswer = checkAnswer,
-          )
-        }
+      PlugCard(
+        challengeText = challenge.string(),
+        inputValue = answer,
+        onInputChange = {
+          answer = it
+          isError = false
+        },
+        onCheckAnswer = { response ->
+          isError = response == null || !challenge.checkAnswer(response)
+          if (!isError) checkAnswer(response)
+        },
+        placeholder = stringResource(R.string.challenge_answer_hint),
+        ctaText = stringResource(R.string.unlock_app),
+        isError = isError,
+        modifier = Modifier.widthIn(max = 440.dp).fillMaxWidth(),
+      )
+      if (isError) {
+        Text(stringResource(R.string.answer_try_again), color = MaterialTheme.colorScheme.error)
+      }
+      Text(
+        stringResource(R.string.opening_challenge_hint),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+      )
+      TextButton(onClick = onExitChallenge) {
+        Text(stringResource(R.string.return_to_home))
       }
     }
   }
 }
 
-@Composable
-private fun Content(
-  challenge: NumericalChallenge,
-  checkAnswer: (Int?) -> Unit,
-  triggerAnimation: Boolean,
-) {
-  when (challenge) {
-    is TwoOperandsChallenge -> TwoOperandsChallengeView(
-      modifier = Modifier.padding(16.dp),
-      challenge = challenge,
-      triggerAnimation = triggerAnimation,
-    )
-    is MissingChallenge -> MissingChallengeView(
-      modifier = Modifier.padding(16.dp),
-      challenge = challenge,
-      triggerAnimation = triggerAnimation,
-    )
-    is SquareChallenge -> SquareChallengeView(
-      modifier = Modifier.padding(16.dp),
-      challenge = challenge,
-      triggerAnimation = triggerAnimation,
-    )
-    // Placeholder for generated challenges, do not remove
-  }
-  NumericalInputView(modifier = Modifier.fillMaxWidth(), checkAnswer = checkAnswer)
-}
-
-@Preview
-@Preview(name = "Landscape", widthDp = 640, heightDp = 360)
+@Preview(showBackground = true)
 @Composable
 private fun NumericalScreenPreview() {
   NumericalChallengeScreen(

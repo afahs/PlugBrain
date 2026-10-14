@@ -58,8 +58,8 @@ val Warning800 = Color(0xFF78350F)
 val Warning900 = Color(0xFF5A2A0C)
 
 // Gradient Colors
-val GradientStart = Color(0xFF2497AE)
-val GradientEnd = Color(0xFF0D7777)
+val GradientStart = Color(0xFF7561B8)
+val GradientEnd = Color(0xFF514185)
 
 // The Linear Gradient Brush
 val PrimaryGradient = Brush.linearGradient(

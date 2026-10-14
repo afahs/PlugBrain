@@ -18,4 +18,8 @@ class MathChallengeRepository(
     }
 
   fun getMaxDifficulty(): Int = challengesFactory.maxDifficulty()
+
+  fun generateChallenge(level: Int): Challenge = challengesFactory.getChallengeByDifficulty(
+    level.coerceIn(challengesFactory.minDifficulty(), challengesFactory.maxDifficulty()),
+  )
 }

@@ -25,7 +25,7 @@ fun DataStore<Preferences>.getUserSettings(): Flow<UserSettings> =
       blockInterval = it[BLOCK_INTERVAL_KEY] ?: DEFAULT_BLOCK_INTERVAL,
       distractiveApps = it[BLOCKED_APPS_KEY] ?: emptySet(),
       selectedMinimalDifficulty = it[MINIMAL_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY,
-      currentDifficultyLevel = it[PROGRESSIVE_DIFFICULTY_KEY] ?: it[MINIMAL_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY,
+      currentDifficultyLevel = maxOf(it[PROGRESSIVE_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY, it[MINIMAL_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY),
     )
   }
 
@@ -39,7 +39,7 @@ suspend fun DataStore<Preferences>.setSelectedMinimalDifficulty(minDifficulty: I
 
 suspend fun DataStore<Preferences>.addDistractiveApp(packageName: String) {
   edit { preferences ->
-    preferences[BLOCKED_APPS_KEY] = preferences[BLOCKED_APPS_KEY]?.plus(packageName) ?: emptySet()
+    preferences[BLOCKED_APPS_KEY] = (preferences[BLOCKED_APPS_KEY] ?: emptySet()) + packageName
   }
 }
 
@@ -63,8 +63,19 @@ suspend fun DataStore<Preferences>.updateBlockAppsToggle(isBlocked: Boolean) {
 
 fun DataStore<Preferences>.getProgressiveDifficulty() = data
   .map { preferences ->
-    preferences[PROGRESSIVE_DIFFICULTY_KEY] ?: preferences[MINIMAL_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY
+    maxOf(preferences[PROGRESSIVE_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY, preferences[MINIMAL_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY)
   }
+
+/** Reserves this opening's level and persists the next level atomically. */
+suspend fun DataStore<Preferences>.reserveOpeningDifficulty(maxDifficulty: Int): Int {
+  var level = DEFAULT_MINIMAL_DIFFICULTY
+  edit { prefs ->
+    val minimum = prefs[MINIMAL_DIFFICULTY_KEY] ?: DEFAULT_MINIMAL_DIFFICULTY
+    level = maxOf(prefs[PROGRESSIVE_DIFFICULTY_KEY] ?: minimum, minimum).coerceIn(0, maxDifficulty)
+    prefs[PROGRESSIVE_DIFFICULTY_KEY] = (level + 1).coerceAtMost(maxDifficulty)
+  }
+  return level
+}
 
 suspend fun DataStore<Preferences>.decrementProgressiveDifficulty(steps: Int = 1) {
   edit { prefs ->

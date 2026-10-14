@@ -8,13 +8,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -23,15 +21,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -81,31 +81,49 @@ fun SettingsScreen(
   ) { innerPadding ->
     LazyColumn(modifier.padding(innerPadding)) {
       item { SettingsTitle() }
-      item { HorizontalDivider(thickness = 8.dp, modifier = Modifier.padding(bottom = 16.dp)) }
       item {
-        Authorizations(
-          permissionsState = permissionsState,
-          onAccessibilityClicked = onAccessibilityClicked,
-          onUsageStatsClicked = onUsageStatsClicked,
-          batteryOptimizationClicked = batteryOptimizationClicked,
-          onSystemAlertWindow = onSystemAlertWindow,
-        )
+        SettingsCard {
+          Authorizations(
+            permissionsState = permissionsState,
+            onAccessibilityClicked = onAccessibilityClicked,
+            onUsageStatsClicked = onUsageStatsClicked,
+            batteryOptimizationClicked = batteryOptimizationClicked,
+            onSystemAlertWindow = onSystemAlertWindow,
+          )
+        }
       }
-      item { HorizontalDivider(thickness = 8.dp) }
-      item { BlockedApplications(lockedApps, onBlockApplicationsClicked) }
-      item { HorizontalDivider(thickness = 8.dp) }
-      item { Timing(blockInterval, onUpdateBlockInterval) }
-      item { HorizontalDivider(thickness = 8.dp, modifier = Modifier.padding(top = 16.dp)) }
+      item { SettingsCard { BlockedApplications(lockedApps, onBlockApplicationsClicked) } }
       item {
-        MinDifficulty(
-          minimalDifficulty = minDifficulty,
-          selectedMinDifficulty = selectedMinDifficulty,
-          maximalDifficulty = maxDifficulty,
-          minimalDifficultySample = minDifficultySample,
-          onMinDifficultySelected = onMinDifficultySelected,
-        )
+        SettingsCard {
+          Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.how_it_works), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.opening_challenge_hint), style = MaterialTheme.typography.bodyLarge)
+          }
+        }
+      }
+      item {
+        SettingsCard {
+          MinDifficulty(
+            minimalDifficulty = minDifficulty,
+            selectedMinDifficulty = selectedMinDifficulty,
+            maximalDifficulty = maxDifficulty,
+            minimalDifficultySample = minDifficultySample,
+            onMinDifficultySelected = onMinDifficultySelected,
+          )
+        }
       }
     }
+  }
+}
+
+@Composable
+private fun SettingsCard(content: @Composable () -> Unit) {
+  Card(
+    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
+    shape = RoundedCornerShape(24.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+  ) {
+    Column(Modifier.padding(vertical = 16.dp)) { content() }
   }
 }
 
@@ -122,22 +140,16 @@ fun MinDifficulty(
     modifier = Modifier.padding(horizontal = 32.dp),
   ) {
     Text(
-      text = stringResource(R.string.minimal_difficulty),
+      text = stringResource(R.string.starting_difficulty),
       style = MaterialTheme.typography.titleLarge,
       modifier = Modifier.padding(bottom = 8.dp, top = 16.dp),
     )
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-      val percent =
-        (selectedMinDifficulty - minimalDifficulty).toFloat() / (maximalDifficulty - minimalDifficulty)
-      val offsetX = (maxWidth - 80.dp) * percent
-      Text(
-        text = minimalDifficultySample.string(),
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier
-          .offset(x = offsetX)
-          .align(Alignment.CenterStart),
-      )
-    }
+    Text(
+      text = stringResource(R.string.opening_level, selectedMinDifficulty) + " · " + minimalDifficultySample.string(),
+      style = MaterialTheme.typography.bodyLarge,
+      color = MaterialTheme.colorScheme.primary,
+      modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+    )
     Slider(
       value = selectedMinDifficulty.toFloat(),
       onValueChange = { value ->
@@ -145,9 +157,8 @@ fun MinDifficulty(
       },
       valueRange = minimalDifficulty.toFloat()..maximalDifficulty.toFloat(),
       colors = SliderDefaults.colors(
-        activeTrackColor = MaterialTheme.colorScheme.inversePrimary,
-        inactiveTrackColor = MaterialTheme.colorScheme.primary,
-        inactiveTickColor = MaterialTheme.colorScheme.inversePrimary,
+        activeTrackColor = MaterialTheme.colorScheme.primary,
+        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
         thumbColor = MaterialTheme.colorScheme.primary,
       ),
       steps = maximalDifficulty - minimalDifficulty - 1,
@@ -158,8 +169,8 @@ fun MinDifficulty(
 @Composable
 fun SettingsTitle() {
   Text(
-    text = stringResource(R.string.app_name),
-    style = MaterialTheme.typography.displayMedium,
+    text = stringResource(R.string.settings_title),
+    style = MaterialTheme.typography.headlineLarge,
     modifier = Modifier
       .fillMaxWidth()
       .padding(top = 16.dp, start = 32.dp, bottom = 16.dp),
@@ -217,11 +228,15 @@ fun BlockedApplications(
   ) {
     Column(modifier = Modifier.weight(1f)) {
       Text(
-        text = pluralStringResource(
-          R.plurals.applications_blocked,
-          lockedApps.size,
-          lockedApps.size,
-        ),
+        text = if (lockedApps.isEmpty()) {
+          stringResource(R.string.manage_apps)
+        } else {
+          pluralStringResource(
+            R.plurals.selected_app_count,
+            lockedApps.size,
+            lockedApps.size,
+          )
+        },
         style = MaterialTheme.typography.titleLarge,
         modifier = Modifier.padding(start = 32.dp, top = 16.dp, bottom = 8.dp),
       )

@@ -16,11 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.plugbrain.android.ui.designsystem.components.button.PlugButtonSecondary
+import app.plugbrain.android.ui.designsystem.components.button.PlugButtonPrimary
 import app.plugbrain.android.ui.designsystem.components.textfield.PlugNumericalInput
 import app.plugbrain.android.ui.theme.MathlockAppTheme
 
@@ -62,7 +63,7 @@ fun PlugCard(
       Text(
         text = challengeText,
         style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold),
-        maxLines = 1,
+        maxLines = 2,
         color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
@@ -78,18 +79,18 @@ fun PlugCard(
         modifier = Modifier.fillMaxWidth(),
       )
 
-      PlugButtonSecondary(
+      PlugButtonPrimary(
         text = ctaText,
         onClick = { onCheckAnswer(inputValue.toIntOrNull()) },
         enabled = inputValue.isNotEmpty(),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().testTag("Submit Answer"),
       )
     }
   }
 }
 
-private val CardShape = RoundedCornerShape(16.dp)
-private val CardElevation = 4.dp
+private val CardShape = RoundedCornerShape(24.dp)
+private val CardElevation = 0.dp
 
 @Preview(
   name = "Light Mode",

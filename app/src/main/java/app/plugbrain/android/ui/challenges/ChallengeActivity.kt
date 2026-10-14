@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import app.plugbrain.android.challenges.NumericalChallenge
+import app.plugbrain.android.service.AppOpeningSession
 import app.plugbrain.android.ui.challenges.compose.NumericalChallengeScreen
 import app.plugbrain.android.ui.challenges.presentation.ArithChallengeViewModel
 import app.plugbrain.android.ui.theme.MathlockAppTheme
@@ -19,14 +20,17 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ChallengeActivity : ComponentActivity() {
   private val challengeViewModel: ArithChallengeViewModel by viewModel()
+  private var answerAccepted = false
 
   override fun onResume() {
     super.onResume()
     isInForeground = true
-    challengeViewModel.generateChallenge()
   }
 
   companion object {
+    const val EXTRA_PACKAGE = "selected_app_package"
+    const val EXTRA_DIFFICULTY = "opening_difficulty"
+    const val EXTRA_OPENING_ID = "opening_id"
     var isInForeground: Boolean = false
   }
 
@@ -37,6 +41,7 @@ class ChallengeActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    challengeViewModel.generateChallenge(intent.getIntExtra(EXTRA_DIFFICULTY, 1))
     handleBackButton()
 
     enableEdgeToEdge()
@@ -61,6 +66,7 @@ class ChallengeActivity : ComponentActivity() {
   }
 
   private val exitToHomeScreen: () -> Unit = {
+    AppOpeningSession.gate.leave()
     val intent = Intent(Intent.ACTION_MAIN).apply {
       addCategory(Intent.CATEGORY_HOME)
       flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -73,9 +79,16 @@ class ChallengeActivity : ComponentActivity() {
     challenge: NumericalChallenge,
     response: Int?,
   ) {
+    if (answerAccepted) return
     if (response != null && challenge.checkAnswer(response)) {
-      challengeViewModel.unblockApps()
-      finishAffinity()
+      val target = intent.getStringExtra(EXTRA_PACKAGE)
+      if (target != null && AppOpeningSession.gate.complete(target, intent.getLongExtra(EXTRA_OPENING_ID, -1))) {
+        answerAccepted = true
+        packageManager.getLaunchIntentForPackage(target)?.let { startActivity(it) }
+        finish()
+      } else {
+        exitToHomeScreen()
+      }
     } else {
       Toast.makeText(
         this@ChallengeActivity,
@@ -90,9 +103,16 @@ class ChallengeActivity : ComponentActivity() {
       this,
       object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-          // Intentionally do nothing
+          exitToHomeScreen()
         }
       },
     )
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    answerAccepted = false
+    challengeViewModel.generateChallenge(intent.getIntExtra(EXTRA_DIFFICULTY, 1), replace = true)
   }
 }

@@ -31,9 +31,7 @@ class ArithChallengeScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(challenge.operand1.toString()).assertIsDisplayed()
-        composeTestRule.onNodeWithText("+").assertIsDisplayed()
-        composeTestRule.onNodeWithText(challenge.operand2.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(challenge.string()).assertIsDisplayed()
 
         composeTestRule.onNode(hasSetTextAction()).performTextInput((challenge.operand1 + challenge.operand2).toString())
 
