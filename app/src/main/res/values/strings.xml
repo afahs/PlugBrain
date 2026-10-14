@@ -8,7 +8,10 @@
     <string name="return_to_home">Return to home</string>
     <string name="opening_challenge_hint">A challenge at every opening. Uninterrupted time once you solve it.</string>
     <string name="next_challenge">YOUR NEXT CHALLENGE</string>
-    <string name="progression_description">Each opening raises the next level, up to the hardest challenge. Progress is shared across your selected apps.</string>
+    <string name="progression_description">Each opening raises the next level. Time away lowers it toward your starting difficulty. Progress is shared across selected apps.</string>
+    <string name="difficulty_recovery">Difficulty recovery</string>
+    <string name="recovery_interval_label">Drop 1 level every %1$d minutes away</string>
+    <string name="recovery_description">Stay away from all selected apps to lower the next challenge level. Recovery stops at your starting difficulty. Using an app or answering its challenge pauses recovery.</string>
     <string name="selected_apps">Selected apps</string>
     <string name="select_apps_hint">Choose the apps you want to open more intentionally.</string>
     <string name="manage_apps">Manage apps</string>

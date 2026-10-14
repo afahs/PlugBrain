@@ -1,10 +1,12 @@
 package app.plugbrain.android.service
 
 import android.accessibilityservice.AccessibilityService
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.PowerManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityWindowInfo
 import androidx.core.content.ContextCompat
@@ -12,6 +14,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import app.plugbrain.android.challenges.factory.ChallengeFactory
 import app.plugbrain.android.datastore.getUserSettings
+import app.plugbrain.android.datastore.markAwayFromSelectedApps
 import app.plugbrain.android.datastore.model.UserSettings
 import app.plugbrain.android.datastore.reserveOpeningDifficulty
 import app.plugbrain.android.datastore.setLastUsageTime
@@ -35,6 +38,7 @@ class MathLockService : AccessibilityService() {
   private val screenReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
       gate.leave()
+      serviceScope.launch { dataStore.markAwayFromSelectedApps() }
     }
   }
 
@@ -64,6 +68,7 @@ class MathLockService : AccessibilityService() {
   }
 
   private fun checkForegroundApp() {
+    if (!getSystemService(PowerManager::class.java).isInteractive || getSystemService(KeyguardManager::class.java).isKeyguardLocked) return
     val settings = userSettings ?: return
     // Ignore keyboards, notification shade and system overlays.
     val activeWindow = windows.firstOrNull {
@@ -72,6 +77,9 @@ class MathLockService : AccessibilityService() {
     val root = activeWindow.root ?: return
     val foreground = root.packageName?.toString() ?: return
     if (foreground == "com.android.systemui" || foreground == "android") return
+    if (foreground !in settings.distractiveApps && !gate.isChallengeOrReturnWindow(foreground, packageName)) {
+      serviceScope.launch { dataStore.markAwayFromSelectedApps() }
+    }
     if (!gate.onForeground(foreground, settings.distractiveApps, packageName)) return
     val openingId = gate.requestId
 

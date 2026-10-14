@@ -40,6 +40,10 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,9 +55,13 @@ import androidx.compose.ui.unit.dp
 import app.plugbrain.android.R
 import app.plugbrain.android.challenges.Challenge
 import app.plugbrain.android.challenges.addition.AdditionTwoDigitsCarryFreeChallenge
+import app.plugbrain.android.datastore.DEFAULT_RECOVERY_INTERVAL
+import app.plugbrain.android.datastore.MAX_RECOVERY_INTERVAL
+import app.plugbrain.android.datastore.MIN_RECOVERY_INTERVAL
 import app.plugbrain.android.repository.model.InstalledApp
 import app.plugbrain.android.repository.model.PermissionsState
 import coil3.compose.rememberAsyncImagePainter
+import kotlin.math.roundToInt
 
 @Composable
 fun SettingsScreen(
@@ -72,6 +80,8 @@ fun SettingsScreen(
   onSystemAlertWindow: () -> Unit,
   onUpdateBlockInterval: (Int) -> Unit,
   onMinDifficultySelected: (Int) -> Unit,
+  recoveryIntervalMinutes: Int = DEFAULT_RECOVERY_INTERVAL,
+  onRecoveryIntervalChanged: (Int) -> Unit = {},
 ) {
   Scaffold(
     modifier = Modifier
@@ -103,6 +113,11 @@ fun SettingsScreen(
       }
       item {
         SettingsCard {
+          RecoveryInterval(recoveryIntervalMinutes, onRecoveryIntervalChanged)
+        }
+      }
+      item {
+        SettingsCard {
           MinDifficulty(
             minimalDifficulty = minDifficulty,
             selectedMinDifficulty = selectedMinDifficulty,
@@ -113,6 +128,31 @@ fun SettingsScreen(
         }
       }
     }
+  }
+}
+
+@Composable
+private fun RecoveryInterval(minutes: Int, onChanged: (Int) -> Unit) {
+  var sliderValue by remember(minutes) { mutableFloatStateOf(minutes.toFloat()) }
+  Column(Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Text(stringResource(R.string.difficulty_recovery), style = MaterialTheme.typography.titleLarge)
+    Text(
+      stringResource(R.string.recovery_interval_label, sliderValue.roundToInt()),
+      color = MaterialTheme.colorScheme.primary,
+      style = MaterialTheme.typography.bodyLarge,
+    )
+    Slider(
+      value = sliderValue,
+      onValueChange = { sliderValue = (it / 5).roundToInt() * 5f },
+      onValueChangeFinished = { onChanged(sliderValue.roundToInt()) },
+      valueRange = MIN_RECOVERY_INTERVAL.toFloat()..MAX_RECOVERY_INTERVAL.toFloat(),
+      steps = (MAX_RECOVERY_INTERVAL - MIN_RECOVERY_INTERVAL) / 5 - 1,
+    )
+    Text(
+      stringResource(R.string.recovery_description),
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
   }
 }
 

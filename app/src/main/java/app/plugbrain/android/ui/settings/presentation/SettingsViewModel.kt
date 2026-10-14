@@ -10,6 +10,7 @@ import app.plugbrain.android.challenges.factory.ChallengeFactory
 import app.plugbrain.android.datastore.getUserSettings
 import app.plugbrain.android.datastore.model.UserSettings
 import app.plugbrain.android.datastore.setBlockInterval
+import app.plugbrain.android.datastore.setRecoveryInterval
 import app.plugbrain.android.datastore.setSelectedMinimalDifficulty
 import app.plugbrain.android.repository.InstalledAppsRepository
 import app.plugbrain.android.repository.PermissionsRepository
@@ -78,6 +79,10 @@ class SettingsViewModel(
       dataStore.setSelectedMinimalDifficulty(minDifficulty)
       _minimalDifficultySample.value = challengeFactory.getChallengeByDifficulty(minDifficulty)
     }
+  }
+
+  fun updateRecoveryInterval(minutes: Int) {
+    viewModelScope.launch { dataStore.setRecoveryInterval(minutes) }
   }
 
   fun getMaxDifficulty() = challengeFactory.maxDifficulty()

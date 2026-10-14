@@ -9,6 +9,9 @@ class AppOpeningGate {
   var requestId: Long = 0
     private set
 
+  fun isChallengeOrReturnWindow(packageName: String, ownPackage: String): Boolean =
+    packageName == ownPackage && (pendingPackage != null || returningPackage != null)
+
   fun onForeground(packageName: String, selectedApps: Set<String>, ownPackage: String): Boolean {
     // Window callbacks can still report the challenge while the target is opening.
     if (packageName == ownPackage && returningPackage != null) return false

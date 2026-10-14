@@ -62,6 +62,8 @@ class SettingsActivity : ComponentActivity() {
           minDifficulty = settingsViewModel.getMinDifficulty(),
           maxDifficulty = settingsViewModel.getMaxDifficulty(),
           selectedMinDifficulty = challengeSettings.selectedMinimalDifficulty,
+          recoveryIntervalMinutes = challengeSettings.recoveryIntervalMinutes,
+          onRecoveryIntervalChanged = settingsViewModel::updateRecoveryInterval,
           minDifficultySample = minimalDifficultySample,
           onBlockApplicationsClicked = {
             startActivity(

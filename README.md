@@ -14,7 +14,7 @@
 
 
 # PlugBrain
-This fork asks for a mental math challenge whenever a selected app enters the foreground. Solve it to use that app without timed scrolling interruptions. Leaving and returning, switching to another selected app, or locking the screen starts a new challenge. Each opening increases the next difficulty level across all selected apps, up to level 15. Difficulty is saved on-device and does not decay over time.
+This fork asks for a mental math challenge whenever a selected app enters the foreground. Solve it to use that app without timed scrolling interruptions. Leaving and returning, switching to another selected app, or locking the screen starts a new challenge. Each opening increases the next difficulty level across all selected apps, up to level 15. Difficulty is saved in app storage and drops one level per recovery interval spent away from all selected apps. Choose 5–120 minutes per level in Settings (default 30 minutes); recovery stops at the starting difficulty.
 To regain access, you’ll need to solve a math challenge that adjusts in difficulty: 
 the more frequently you use the apps, 
 the harder the challenges become, but the longer you stay away, the easier they get.
@@ -30,7 +30,7 @@ the harder the challenges become, but the longer you stay away, the easier they 
 ## Features
   - Blocks distracting apps
   - Unblock apps by solving math challenges
-  - Difficulty increases with every app opening and persists between sessions
+  - Difficulty increases with openings and decreases with configurable time away
   - No tracking, no ads
   - No internet required
 
